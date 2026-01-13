@@ -85,16 +85,3 @@ class HealthResponse(BaseModel):
         default_factory=lambda: datetime.utcnow().isoformat(),
         description="Health check timestamp"
     )
-
-class WorkerConfig(BaseModel):
-    """Worker configuration"""
-    target_api_url: str = Field(default="http://localhost:11434")
-    proxy_server_url: str = Field(default="ws://localhost:8080/worker")
-    reconnect_delay: int = Field(default=5, description="Delay in seconds before reconnecting")
-    request_timeout: float = Field(default=30.0, description="Request timeout in seconds")
-
-class ProxyConfig(BaseModel):
-    """Proxy server configuration"""
-    title: str = Field(default="Proxy Server")
-    worker_timeout: float = Field(default=30.0, description="Worker timeout in seconds")
-    stream_timeout: float = Field(default=30.0, description="Stream timeout in seconds")

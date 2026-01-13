@@ -5,15 +5,14 @@ import json
 import httpx
 import logging
 from typing import AsyncGenerator
-
+from worker.config import WorkerConfig
 from common.models import (
     MessageType,
     ProxyRequest,
     ResponseStart,
     ResponseChunk,
     ResponseEnd,
-    ErrorMessage,
-    WorkerConfig
+    ErrorMessage
 )
 
 logging.basicConfig(level=logging.INFO)

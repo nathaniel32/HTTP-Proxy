@@ -5,7 +5,7 @@ import json
 import uuid
 import logging
 from typing import Dict
-
+from server.config import ProxyConfig
 from common.models import (
     MessageType,
     HTTPMethod,
@@ -13,8 +13,7 @@ from common.models import (
     ResponseStart,
     ResponseChunk,
     ErrorMessage,
-    HealthResponse,
-    ProxyConfig
+    HealthResponse
 )
 
 logging.basicConfig(level=logging.INFO)
