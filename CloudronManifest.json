@@ -1,0 +1,8 @@
+{
+    "id": "com.threedmedico.ollamapython",
+    "title": "Ollama Python",
+    "version": "0.0.1",
+    "healthCheckPath": "/health",
+    "httpPort": 8080,
+    "manifestVersion": 2
+}
