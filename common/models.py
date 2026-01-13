@@ -3,7 +3,6 @@ from typing import Dict, Optional, Any
 from enum import Enum
 from datetime import datetime
 
-
 class MessageType(str, Enum):
     """Types of messages exchanged between proxy and worker"""
     REQUEST = "request"
@@ -11,7 +10,6 @@ class MessageType(str, Enum):
     RESPONSE_CHUNK = "response_chunk"
     RESPONSE_END = "response_end"
     ERROR = "error"
-
 
 class HTTPMethod(str, Enum):
     """Supported HTTP methods"""
@@ -22,7 +20,6 @@ class HTTPMethod(str, Enum):
     PATCH = "PATCH"
     OPTIONS = "OPTIONS"
     HEAD = "HEAD"
-
 
 class ProxyRequest(BaseModel):
     """Request message sent from proxy server to worker"""
@@ -41,7 +38,6 @@ class ProxyRequest(BaseModel):
     class Config:
         use_enum_values = True
 
-
 class ResponseStart(BaseModel):
     """Initial response message from worker to proxy"""
     type: MessageType = Field(default=MessageType.RESPONSE_START)
@@ -53,7 +49,6 @@ class ResponseStart(BaseModel):
     class Config:
         use_enum_values = True
 
-
 class ResponseChunk(BaseModel):
     """Streaming response chunk from worker to proxy"""
     type: MessageType = Field(default=MessageType.RESPONSE_CHUNK)
@@ -63,7 +58,6 @@ class ResponseChunk(BaseModel):
     class Config:
         use_enum_values = True
 
-
 class ResponseEnd(BaseModel):
     """End of response signal from worker to proxy"""
     type: MessageType = Field(default=MessageType.RESPONSE_END)
@@ -71,7 +65,6 @@ class ResponseEnd(BaseModel):
 
     class Config:
         use_enum_values = True
-
 
 class ErrorMessage(BaseModel):
     """Error message from worker to proxy"""
@@ -83,7 +76,6 @@ class ErrorMessage(BaseModel):
     class Config:
         use_enum_values = True
 
-
 class HealthResponse(BaseModel):
     """Health check response"""
     status: str = Field(..., description="Service status")
@@ -94,21 +86,12 @@ class HealthResponse(BaseModel):
         description="Health check timestamp"
     )
 
-
 class WorkerConfig(BaseModel):
     """Worker configuration"""
-    target_api_host: str = Field(default="localhost")
-    target_api_port: int = Field(default=11434)
-    target_api_scheme: str = Field(default="http")
+    target_api_url: str = Field(default="http://localhost:11434")
     proxy_server_url: str = Field(default="ws://localhost:8000/worker")
     reconnect_delay: int = Field(default=5, description="Delay in seconds before reconnecting")
     request_timeout: float = Field(default=30.0, description="Request timeout in seconds")
-
-    @property
-    def target_api_url(self) -> str:
-        """Full target API URL"""
-        return f"{self.target_api_scheme}://{self.target_api_host}:{self.target_api_port}"
-
 
 class ProxyConfig(BaseModel):
     """Proxy server configuration"""

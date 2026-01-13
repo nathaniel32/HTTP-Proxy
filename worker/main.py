@@ -193,6 +193,7 @@ if __name__ == "__main__":
         target_api_host="localhost",
         target_api_port=11434,
         target_api_scheme="http",
+        target_api_url="http://localhost:11434"
         proxy_server_url="ws://localhost:8000/worker"
     )
     
