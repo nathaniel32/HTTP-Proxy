@@ -6,15 +6,7 @@ import uuid
 import logging
 from typing import Dict
 from server.config import ProxyConfig
-from common.models import (
-    MessageType,
-    HTTPMethod,
-    ProxyRequest,
-    ResponseStart,
-    ResponseChunk,
-    ErrorMessage,
-    HealthResponse
-)
+from common.models import MessageType, HTTPMethod, ProxyRequest, ResponseStart, ResponseChunk, ErrorMessage, HealthResponse
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

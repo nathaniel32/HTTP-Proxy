@@ -6,14 +6,7 @@ import httpx
 import logging
 from typing import AsyncGenerator
 from worker.config import WorkerConfig
-from common.models import (
-    MessageType,
-    ProxyRequest,
-    ResponseStart,
-    ResponseChunk,
-    ResponseEnd,
-    ErrorMessage
-)
+from common.models import MessageType, ProxyRequest, ResponseStart, ResponseChunk, ResponseEnd, ErrorMessage
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
