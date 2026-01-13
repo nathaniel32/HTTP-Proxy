@@ -35,5 +35,5 @@ ollama-proxy-python.3d-medico.com
 
 - **Start Worker**
     ```
-    bash auto_restart_worker.sh --url <SERVER_WS_HOST>/connection/worker
+    bash auto_restart_worker.sh --server-url <SERVER_WS_URL>/worker --target-hostname <API_HOSTNAME>
     ```
