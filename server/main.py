@@ -200,8 +200,10 @@ class ProxyServer:
             pending_requests=self.manager.pending_count
         )
 
-
-# Initialize server
 config = ProxyConfig()
 server = ProxyServer(config)
 app = server.app
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8080)
