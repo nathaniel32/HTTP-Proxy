@@ -137,7 +137,7 @@ class ProxyWorker:
     
     async def _connect_and_process(self):
         """Connect to proxy server and process messages"""
-        async with websockets.connect(self.config.proxy_server_url) as websocket:
+        async with websockets.connect(self.config.proxy_server_url, ssl=self.ssl_context) as websocket:
             logger.info(f"Connected to proxy server at {self.config.proxy_server_url}")
             logger.info(f"Forwarding requests to {self.config.target_hostname}")
             
