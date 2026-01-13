@@ -17,7 +17,6 @@ pending_requests: Dict[str, asyncio.Queue] = {}
 
 @app.websocket("/worker")
 async def worker_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for workers to connect"""
     await websocket.accept()
     worker_id = str(uuid.uuid4())
     workers[worker_id] = websocket
