@@ -8,7 +8,7 @@ import ssl
 import certifi
 from typing import AsyncGenerator
 from worker.config import WorkerConfig
-from common.models import MessageType, ProxyRequest, ResponseStart, ResponseChunk, ResponseEnd, ErrorMessage, BaseMessage
+from common.models import MessageType, ProxyRequest, ResponseStart, ResponseChunk, ResponseEnd, ErrorMessage
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -142,14 +142,12 @@ class ProxyWorker:
         """Handle incoming message from proxy server"""
         try:
             request_data = json.loads(message)
-
-            base_message = BaseMessage(**request_data)
             
-            if base_message.type == MessageType.REQUEST:
+            if request_data.get("type") == MessageType.REQUEST:
                 async for response_part in self.handler.process(request_data):
                     await websocket.send(json.dumps(response_part))
                 
-                logger.info(f"Response completed for request {base_message.request_id}")
+                logger.info(f"Response completed for request {request_data.get('request_id')}")
                 
         except json.JSONDecodeError as e:
             logger.error(f"Invalid JSON message: {e}")
