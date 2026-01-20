@@ -8,4 +8,6 @@ class WorkerConfig(BaseModel):
     request_timeout: float = Field(default=30.0, description="Request timeout in seconds")
     api_key: Optional[str] = Field(default=None, description="API key for authentication (optional)")
 
-worker_config = WorkerConfig()
+worker_config = WorkerConfig(
+    api_key = None        # server api key
+)

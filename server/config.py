@@ -7,4 +7,6 @@ class ProxyConfig(BaseModel):
     stream_timeout: float = Field(default=30.0, description="Stream timeout in seconds")
     api_key: Optional[str] = Field(default=None, description="API key for authentication (optional)")
 
-server_config = ProxyConfig()
+server_config = ProxyConfig(
+    api_key = None        # api key for client and worker
+)
