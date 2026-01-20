@@ -6,7 +6,7 @@ import uuid
 import logging
 from typing import List, Dict
 from server.config import ProxyConfig
-from common.models import MessageType, HTTPMethod, ProxyRequest, ResponseStart, ResponseChunk, ErrorMessage, HealthResponse
+from common.models import MessageType, HTTPMethod, ProxyRequest, ResponseStart, ResponseChunk, ErrorMessage, HealthResponse, BaseMessage
 
 
 logging.basicConfig(level=logging.INFO)
@@ -118,13 +118,13 @@ class ProxyServer:
                 timeout=self.config.worker_timeout
             )
             
-            msg_type = first_message.get("type")
+            base_message = BaseMessage(**first_message)
             
-            if msg_type == MessageType.ERROR:
+            if base_message.type == MessageType.ERROR:
                 error_msg = ErrorMessage(**first_message)
                 raise HTTPException(status_code=500, detail=error_msg.error)
             
-            if msg_type != MessageType.RESPONSE_START:
+            if base_message.type != MessageType.RESPONSE_START:
                 raise HTTPException(status_code=502, detail="Invalid response from worker")
             
             response_start = ResponseStart(**first_message)
@@ -154,14 +154,15 @@ class ProxyServer:
                     queue.get(), 
                     timeout=self.config.stream_timeout
                 )
-                msg_type = message.get("type")
+
+                base_message = BaseMessage(**message)
                 
-                if msg_type == MessageType.RESPONSE_CHUNK:
+                if base_message.type == MessageType.RESPONSE_CHUNK:
                     chunk_msg = ResponseChunk(**message)
                     yield chunk_msg.chunk
-                elif msg_type == MessageType.RESPONSE_END:
+                elif base_message.type == MessageType.RESPONSE_END:
                     break
-                elif msg_type == MessageType.ERROR:
+                elif base_message.type == MessageType.ERROR:
                     error_msg = ErrorMessage(**message)
                     logger.error(f"Stream error for {request_id}: {error_msg.error}")
                     break
