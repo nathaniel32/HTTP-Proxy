@@ -131,7 +131,7 @@ class ProxyWorker:
     
     async def _connect_and_process(self):
         """Connect to proxy server and process messages"""
-        async with websockets.connect(self.config.proxy_server_url, ssl=self.ssl_context) as websocket:
+        async with websockets.connect(self.config.proxy_server_url, ssl=self.ssl_context, additional_headers={"Authorization": f"Bearer {self.config.api_key}"}) as websocket:
             logger.info(f"Connected to proxy server at {self.config.proxy_server_url}")
             logger.info(f"Forwarding requests to {self.config.target_hostname}")
             
@@ -179,6 +179,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Worker")
     parser.add_argument("--server-url", type=str)
     parser.add_argument("--target-hostname", type=str)
+    parser.add_argument("--server-api-key", type=str)
     args = parser.parse_args()
 
     config = WorkerConfig()
@@ -187,9 +188,12 @@ if __name__ == "__main__":
         config.proxy_server_url = args.server_url
     if args.target_hostname:
         config.target_hostname = args.target_hostname
+    if args.server_api_key:
+        config.api_key = args.server_api_key
 
     logging.info(f"Proxy Server: {config.proxy_server_url}")
     logging.info(f"Target Hostname: {config.target_hostname}")
+    logging.info(f"API Key: {config.api_key}")
     
     worker = ProxyWorker(config)
     
