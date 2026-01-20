@@ -4,11 +4,11 @@ import time
 
 app = FastAPI()
 
-def stream():
-    for i in range(1, 6):
-        yield f"Streaming data {i}\n"
+def event_stream():
+    for i in range(1, 20):
+        yield f"data: Streaming data {i}\n\n"  # SSE format
         time.sleep(1)
 
 @app.get("/")
-def stream_endpoint():
-    return StreamingResponse(stream(), media_type="text/plain")
+def sse():
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
