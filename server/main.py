@@ -281,7 +281,7 @@ class ProxyServer:
 
 
 # Initialize server
-config = ProxyConfig(api_key="123")
+config = ProxyConfig()
 server = ProxyServer(config)
 app = server.app
 
