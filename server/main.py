@@ -4,33 +4,34 @@ import asyncio
 import json
 import uuid
 import logging
-from typing import Dict
+from typing import List, Dict
 from server.config import ProxyConfig
 from common.models import MessageType, HTTPMethod, ProxyRequest, ResponseStart, ResponseChunk, ErrorMessage, HealthResponse
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class WorkerManager:    
     def __init__(self):
-        self.workers: Dict[str, WebSocket] = {}
+        self.workers: List[WebSocket] = []
         self.pending_requests: Dict[str, asyncio.Queue] = {}
     
-    def add_worker(self, worker_id: str, websocket: WebSocket):
-        self.workers[worker_id] = websocket
-        logger.info(f"Worker {worker_id} connected. Total workers: {len(self.workers)}")
+    def add_worker(self, websocket: WebSocket):
+        self.workers.append(websocket)
+        logger.info(f"Worker {id(websocket)} connected. Total workers: {len(self.workers)}")
     
-    def remove_worker(self, worker_id: str):
-        if worker_id in self.workers:
-            del self.workers[worker_id]
-            logger.info(f"Worker {worker_id} removed. Total workers: {len(self.workers)}")
+    def remove_worker(self, websocket: WebSocket):
+        if websocket in self.workers:
+            self.workers.remove(websocket)
+            logger.info(f"Worker {id(websocket)} removed. Total workers: {len(self.workers)}")
     
-    def get_available_worker(self) -> tuple[str, WebSocket]:
+    def get_available_worker(self) -> WebSocket:
         """Get first available worker (TODO: implement load balancing)"""
         if not self.workers:
             raise HTTPException(status_code=503, detail="No workers available")
-        worker_id = next(iter(self.workers))
-        return worker_id, self.workers[worker_id]
+        return self.workers[0]
     
     def create_request_queue(self, request_id: str) -> asyncio.Queue:
         """Create queue for pending request"""
@@ -57,6 +58,7 @@ class WorkerManager:
     def pending_count(self) -> int:
         return len(self.pending_requests)
 
+
 class ProxyServer:    
     def __init__(self, config: ProxyConfig):
         self.config = config
@@ -71,8 +73,7 @@ class ProxyServer:
     
     async def worker_endpoint(self, websocket: WebSocket):
         await websocket.accept()
-        worker_id = str(uuid.uuid4())
-        self.manager.add_worker(worker_id, websocket)
+        self.manager.add_worker(websocket)
         
         try:
             while True:
@@ -81,16 +82,16 @@ class ProxyServer:
                 await self.manager.handle_worker_message(message_dict)
                         
         except WebSocketDisconnect:
-            logger.info(f"Worker {worker_id} disconnected")
+            logger.info(f"Worker {id(websocket)} disconnected")
         except Exception as e:
-            logger.error(f"Worker {worker_id} error: {e}")
+            logger.error(f"Worker {id(websocket)} error: {e}")
         finally:
-            self.manager.remove_worker(worker_id)
+            self.manager.remove_worker(websocket)
     
     async def proxy_request(self, request: Request, path: str):
         """Proxy HTTP requests to workers"""
         
-        worker_id, worker = self.manager.get_available_worker()
+        worker = self.manager.get_available_worker()
         request_id = str(uuid.uuid4())
         
         # Prepare request
@@ -109,7 +110,7 @@ class ProxyServer:
         try:
             # Send to worker
             await worker.send_text(proxy_req.model_dump_json())
-            logger.info(f"Request {request_id} sent to worker {worker_id}: {request.method} /{path}")
+            logger.info(f"Request {request_id} sent to worker {id(worker)}: {request.method} /{path}")
             
             # Wait for response start
             first_message = await asyncio.wait_for(
@@ -179,9 +180,11 @@ class ProxyServer:
             pending_requests=self.manager.pending_count
         )
 
+
 config = ProxyConfig()
 server = ProxyServer(config)
 app = server.app
+
 
 if __name__ == "__main__":
     import uvicorn
