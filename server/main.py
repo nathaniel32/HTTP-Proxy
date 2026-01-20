@@ -17,6 +17,7 @@ class WorkerManager:
     def __init__(self):
         self.workers: List[WebSocket] = []
         self.pending_requests: Dict[str, asyncio.Queue] = {}
+        self.index_dist_worker = 0
     
     def add_worker(self, websocket: WebSocket):
         self.workers.append(websocket)
@@ -31,7 +32,14 @@ class WorkerManager:
         """Get first available worker (TODO: implement load balancing)"""
         if not self.workers:
             raise HTTPException(status_code=503, detail="No workers available")
-        return self.workers[0]
+        
+        dist_worker = self.workers[self.index_dist_worker]
+        self.index_dist_worker = (self.index_dist_worker + 1) % self.worker_count
+
+        print(self.index_dist_worker)
+
+        return dist_worker
+        
     
     def create_request_queue(self, request_id: str) -> asyncio.Queue:
         """Create queue for pending request"""
