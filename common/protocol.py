@@ -38,17 +38,14 @@ class WebSocketProtocol:
             raise
 
     async def receive_message(self, websocket: Union[WebSocket, ClientProtocol]) -> dict:
-        """
-        Receive message using binary chunking protocol.
-        Assumes the next message in the websocket stream is the header.
-        """
+        """Receive message using binary chunking protocol. Assumes the next message in the websocket stream is the header."""
         # Read header
         if isinstance(websocket, WebSocket):
             header = await websocket.receive_bytes()
         else:
             header = await websocket.recv()
             if isinstance(header, str):
-                header = header.encode('utf-8') # Should be bytes for binary protocol
+                header = header.encode('utf-8') # bytes for binary protocol
 
         if len(header) != 8:
             raise ValueError(f"Invalid header size: {len(header)}")

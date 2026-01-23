@@ -80,7 +80,6 @@ class RequestHandler:
                     
                     # Stream data
                     async for data in response.aiter_bytes():
-                        # Base64 encode for safe transport
                         b64_data = base64.b64encode(data).decode('utf-8')
                         yield ResponseData(
                             request_id=proxy_req.request_id,

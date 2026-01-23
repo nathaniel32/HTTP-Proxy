@@ -23,13 +23,11 @@ class WorkerManager:
         self._lock = asyncio.Lock()
     
     async def add_worker(self, websocket: WebSocket):
-        """Add worker with thread-safe lock"""
         async with self._lock:
             self.workers.append(websocket)
             logger.info(f"Worker connected. Total workers: {len(self.workers)}")
     
     async def remove_worker(self, websocket: WebSocket):
-        """Remove worker with thread-safe lock"""
         async with self._lock:
             if websocket in self.workers:
                 self.workers.remove(websocket)
@@ -39,7 +37,7 @@ class WorkerManager:
                 logger.info(f"Worker removed. Total workers: {len(self.workers)}")
     
     async def get_available_worker(self) -> WebSocket:
-        """Get worker using round-robin distribution with thread-safe lock"""
+        """round-robin distribution"""
         async with self._lock:
             if not self.workers:
                 raise HTTPException(status_code=503, detail="No workers available")
