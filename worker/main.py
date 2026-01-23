@@ -8,7 +8,7 @@ import ssl
 import certifi
 from typing import AsyncGenerator
 from worker.config import WorkerConfig, worker_config
-from common.models import MessageType, ProxyRequest, ResponseStart, ResponseChunk, ResponseEnd, ErrorMessage
+from common.models import MessageType, ProxyRequest, ResponseStart, ResponseData, ResponseEnd, ErrorMessage
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -76,11 +76,11 @@ class RequestHandler:
                         content_type=response.headers.get("content-type", "application/json")
                     ).model_dump()
                     
-                    # Stream chunks
-                    async for chunk in response.aiter_text():
-                        yield ResponseChunk(
+                    # Stream data
+                    async for data in response.aiter_text():
+                        yield ResponseData(
                             request_id=proxy_req.request_id,
-                            chunk=chunk
+                            data=data
                         ).model_dump()
                     
                     # Send response end

@@ -7,7 +7,7 @@ import logging
 from typing import List, Dict, Optional
 from datetime import datetime
 from server.config import ProxyConfig, server_config
-from common.models import MessageType, HTTPMethod, ProxyRequest, ResponseStart, ResponseChunk, ErrorMessage, HealthResponse
+from common.models import MessageType, HTTPMethod, ProxyRequest, ResponseStart, ResponseData, ErrorMessage, HealthResponse
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -239,7 +239,7 @@ class ProxyServer:
             raise HTTPException(status_code=500, detail="Internal proxy error")
     
     async def _stream_response(self, request_id: str, queue: asyncio.Queue):
-        """Stream response chunks from worker to client"""
+        """Stream response data from worker to client"""
         try:
             while True:
                 message = await asyncio.wait_for(
@@ -248,9 +248,9 @@ class ProxyServer:
                 )
                 msg_type = message.get("type")
                 
-                if msg_type == MessageType.RESPONSE_CHUNK:
-                    chunk_msg = ResponseChunk(**message)
-                    yield chunk_msg.chunk.encode('utf-8')
+                if msg_type == MessageType.RESPONSE_DATA:
+                    data_msg = ResponseData(**message)
+                    yield data_msg.data.encode('utf-8')
                     
                 elif msg_type == MessageType.RESPONSE_END:
                     logger.info(f"Stream completed for {request_id}")

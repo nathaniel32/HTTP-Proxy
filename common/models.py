@@ -8,7 +8,7 @@ class MessageType(str, Enum):
     """Types of messages exchanged between proxy and worker"""
     REQUEST = "request"
     RESPONSE_START = "response_start"
-    RESPONSE_CHUNK = "response_chunk"
+    RESPONSE_DATA = "response_data"
     RESPONSE_END = "response_end"
     ERROR = "error"
 
@@ -55,10 +55,10 @@ class ResponseStart(BaseMessage):
     content_type: str = Field(default="application/json")
 
 
-class ResponseChunk(BaseMessage):
-    """Streaming response chunk from worker to proxy"""
-    type: MessageType = Field(default=MessageType.RESPONSE_CHUNK)
-    chunk: str = Field(..., description="Response chunk data")
+class ResponseData(BaseMessage):
+    """Streaming response data from worker to proxy"""
+    type: MessageType = Field(default=MessageType.RESPONSE_DATA)
+    data: str = Field(..., description="Response data")
 
 
 class ResponseEnd(BaseMessage):
